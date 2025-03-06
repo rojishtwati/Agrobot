@@ -1,0 +1,54 @@
+
+function doGet(e){
+  Logger.log(JSON.stringify(e));
+  var result ='Sucess';
+  if(e.parameter=='undefined'){
+    result='No parameter';
+  }
+  else{
+    var sheet_id='10EtbBEYmm_hg7Qj7kXVNmrhZKHxl4OZgw6jcZwMhC30';
+    var sheet =SpreadsheetApp.openById(sheet_id).getActiveSheet();
+    var newRow=sheet.getLastRow()+1;
+    var rowData=[];
+    var Curr_Date=new Date();
+    rowData[0]=Curr_Date;
+    var Curr_Time=Utilities.formatDate(Curr_Date,"Asia/Kathmandu",'HH:mm:ss');
+    rowData[1]=Curr_Time;
+    for(var param in e.parameter){
+      Logger.log('In for loop, param='+param);
+      var value=stripQuotes(e.parameter[param]);
+      Logger.log(param + ':' + e.parameter[param]);
+      switch (param) {
+        case 'soilMoistureValue'://parameter
+          rowData[2] = value; //value in cloumn B
+          result='Written on column B'
+          break;
+        case 'soilMoisture': //paramter
+          rowData[3] = value; //value in cloumn B
+          result+='Written on column C'
+          break;
+        case 'temperature': //Parameter
+          rowData[4] = value; //Value in column E
+          result += 'Written on column E';
+          break;
+        case 'humidity': //Parameter
+          rowData[5] = value; //Value in column F
+          result += ' ,Written on column F';
+          break;  
+        case 'lux': //Parameter
+          rowData[6] = value; //Value in column G
+          result += ' ,Written on column G';
+          break;  
+        default:
+          result = "unsupported parameter";
+      }
+    }
+    Logger.log(JSON.stringify(rowData));
+    var newRange=sheet.getRange(newRow,1,1,rowData.length);
+    newRange.setValues([rowData]);
+  }
+  return ContentService.createTextOutput(result);
+}
+function stripQuotes( value ) {
+  return value.replace(/^["']|['"]$/g, "");
+}
