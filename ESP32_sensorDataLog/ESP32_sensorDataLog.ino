@@ -153,34 +153,4 @@ void sendData(int soilMosVal, int soilMos, int tem, int hum,int lux) {
     Serial.println("==========");
     Serial.println("closing connection");
     client.stop();
-  /*
-  StaticJsonDocument<200> jsonDocument;
-  jsonDocument["soilMoistureValue"] = soilMosVal;
-  jsonDocument["soilMoisture"] = soilMos;
-  jsonDocument["temperature"] = tem;
-  jsonDocument["humidity"] = hum;
-
-
-  String jsonString;
-  serializeJson(jsonDocument, jsonString);  // Convert JSON to string
-
-  // Send HTTP POST request
-    HTTPClient http;
-    http.begin(googleScriptURL);
-    http.addHeader("Content-Type", "application/json");
-
-    int httpResponseCode = http.POST(jsonString);
-
-    if (httpResponseCode > 0) {
-      String response = http.getString();
-      Serial.println("HTTP Response Code: " + String(httpResponseCode));
-      Serial.println("Response: " + response);
-    } else {
-      Serial.println("Error on sending POST: " + String(httpResponseCode));
-    }
-
-    http.end(); // Free resources
-   
-
-*/
 }
