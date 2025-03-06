@@ -1,65 +1,36 @@
 /*
   ESP32 Soil Moisture Sensor and DHT 11 for humidity and Temperature and LDR sensor for light level monitoring
   Author: Rojish Twati AKA Hunter
-  Deployment ID
-  AKfycbzySCEFZkg0AVnhDNbUqR0Gx0z5jPe19WMAxieKdQ43kk9Tn3yYi4CD7f9BkEhb6CU4
-
-  URl
-  https://script.google.com/macros/s/AKfycbzySCEFZkg0AVnhDNbUqR0Gx0z5jPe19WMAxieKdQ43kk9Tn3yYi4CD7f9BkEhb6CU4/exec
-
-  javascript code 
-  example
-  ?switch (param) {
-        case 'soilMoistureValue'://parameter
-          rowData[2] = value; //value in cloumn B
-          result='Written on column B'
-          break;
-        case 'soilMoisture': //paramter
-          rowData[3] = value; //value in cloumn B
-          result+='Written on column C'
-          break;
-        case 'temperature': //Parameter
-          rowData[4] = value; //Value in column E
-          result += 'Written on column E';
-          break;
-        case 'humidity': //Parameter
-          rowData[5] = value; //Value in column F
-          result += ' ,Written on column F';
-          break;  
-          
-*/
+  */
 #include <WiFi.h>
-// #include <HTTPClient.h>
 #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
+#include <DHT11.h>  // include DHT11 library for DHT sensor
 
-const char* ssid = "RoboHunt";
-const char* password = "Robohunt123";
-// const char* googleScriptURL = "https://script.google.com/macros/s/AKfycbyAMo9Gk14Ql5rkCH1LLgNbEEFaRab5YfcVUJNZwL2wI2AT2x1-1E4MDB2BsERBgFr1/exec";
+
+const char* ssid = "yourWi-Fi_SSID"; // change yourWi-Fi_SSID with your WiFi name
+const char* password = "yourWi-Fi_PSW"; // change yourWi-Fi_PSW with your WiFi password
 const char* host = "script.google.com";
 const int httpsPort = 443;
 
-String GAS_ID = "AKfycbzySCEFZkg0AVnhDNbUqR0Gx0z5jPe19WMAxieKdQ43kk9Tn3yYi4CD7f9BkEhb6CU4";
+String GAS_ID = "*****"; //google excel ID
 
-#include <DHT11.h>  // include DHT11 library for DHT sensor 
+int moistureValue, moistureValuePercentage, temperature = 0, humidity = 0, lightIntensityValue,lightIntensityPercentage;
 
 DHT11 dht11(4); // define pin for DHT sensor GPIO pin 4 that is D4
 
-int moistureValue, moistureValuePercentage, temperature = 0, humidity = 0, lightIntensityValue,lightIntensityPercentage;
 const int moistureSensorPin = 36; //define pin for soil sensor pin analog pin 
 
 const int luxPin=39; // define pin for light sensor analog pin
 
 WiFiClientSecure client;
 
-
 // Timing variables
 unsigned long previousMillis = 0;
 const long interval =600*1000;  // 10 minutes in milliseconds
 
 void setup() {
-  // dht.begin();
-  Serial.begin(9600);
+  Serial.begin(9600); 
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
@@ -80,28 +51,29 @@ void loop() {
     // If the reading is successful, print the temperature and humidity values.
     // If there are errors, print the appropriate error messages.
     if (result == 0) {
-      Serial.print("Temperature: ");
-      Serial.print(temperature);
+      Serial.print("Temperature: "); 
+      Serial.print(temperature); //display temp 
       Serial.print(" °C\tHumidity: ");
-      Serial.print(humidity);
+      Serial.print(humidity); // display humidity
       Serial.println(" %");
     } else {
       // Print error message based on the error code.
       Serial.println(DHT11::getErrorString(result));
     }
+    //Check the result of the moisture reading
     moistureValue = analogRead(moistureSensorPin);
     Serial.print("Moisture value:  ");
-    Serial.print(moistureValue);
+    Serial.print(moistureValue); //display mosture 
     Serial.print("\t Moisture %:  ");
-    moistureValuePercentage = (100 - map(moistureValue, 0, 4096, 0, 100));
+    moistureValuePercentage = (100 - map(moistureValue, 0, 4096, 0, 100)); //convert moisture value into percentage
     Serial.print(moistureValuePercentage);
     Serial.println("%");
-
+    //Check the result of the light intensity reading
     lightIntensityValue=analogRead(luxPin);
     Serial.print("LUX value:  ");
-    Serial.print(lightIntensityValue);
+    Serial.print(lightIntensityValue); //display light value
     Serial.print("\t LUX %:  ");
-    lightIntensityPercentage = (map(lightIntensityValue, 0, 4096, 0, 100));
+    lightIntensityPercentage = (map(lightIntensityValue, 0, 4096, 0, 100)); //convert light intensity value into percentage
     Serial.print(lightIntensityPercentage);
     Serial.println("%");
     // if (WiFi.status() == WL_CONNECTED) {
@@ -113,7 +85,7 @@ void loop() {
 
 
 void sendData(int soilMosVal, int soilMos, int tem, int hum,int lux) {
-    Serial.println("==========");
+  Serial.println("==========");
   Serial.print("connecting to ");
   Serial.println(host);
   
